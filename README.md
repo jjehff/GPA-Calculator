@@ -4,7 +4,7 @@ Features:
  - Adding Classes
  - Calculate GPA rounded by 5 decimal points
  - Show all your classes inputted
- - Calculate how many units is needed whilst only achieving A's to reach a certain GPA
+ - Calculate how many units is needed while maintaining a certain GPA to reach a certain GPA
  - Very cool program
 
 
