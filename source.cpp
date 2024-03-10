@@ -22,12 +22,12 @@ void AddClass(std::vector<std::string> &classes, std::vector<double> &unit, std:
 			std::cin >> inputGrade;
 			if (isalpha(inputGrade)) {
 				if (inputGrade != 65 && inputGrade != 66 && inputGrade != 67 && inputGrade != 68 && inputGrade != 70) {
-					std::cout << "Invalid grade! Make sure you enter a letter grade without a sign and to capitalize it!\n";
+					std::cout << "Invalid grade! Make sure you enter a lewtter grade without a sign and to capitalize it!\n";
 					goto A;
 				}
 				else {
 					classes.push_back(name);		// MAYBE STORE IN FILE?
-					unit.push_back(inputUnit);		// Might implement
+					unit.push_back(inputUnit);		// Might implemented
 					grade.push_back(inputGrade);	// Would be beneficial for long term usage
 					printf("INPUTTED: %s %.1f unit(s) with grade of %c\n\n", name.c_str(), inputUnit, inputGrade); // FIX LATER
 					break;
@@ -41,32 +41,60 @@ void AddClass(std::vector<std::string> &classes, std::vector<double> &unit, std:
 	}
 }
 
-void CalculateGPA(std::vector<double> &unit, std::vector<char> &grade) {
-	double unitsAttempted = 0, unitsEarned = 0, GPA;
-	for (int i = 0; i < unit.size(); i++) {
-		unitsAttempted += unit[i];
-		if (grade[i] == 'A') {
-			unitsEarned += unit[i] * 4;
-		}
-		else if (grade[i] == 'B') {
-			unitsEarned += unit[i] * 3;
-		}
-		else if (grade[i] == 'C') {
-			unitsEarned += unit[i] * 2;
-		}
-		else if (grade[i] == 'D') {
-			unitsEarned += unit[i];
+void addUnits(double &unitsAttempted, double &unitsEarned, double &GPA) {
+	while (true) {
+		std::cout << "How many units have you attempted?\n";
+		std::cin >> unitsAttempted;
+		if (isdigit(unitsAttempted)) { // FIX USER VALIDATION LATER
+			std::cout << "Invalid input!\n";
 		}
 		else {
-			continue;
+			std::cout << "What is your current GPA?";
+			std::cin >> GPA;
+			if (isdigit(GPA)) { // FIX USER VALIDATION LATER
+				std::cout << "Invalid input!\n";
+			}
+			else {
+				unitsEarned = GPA * unitsAttempted;
+				std::cout << "SUCCESSFULLY ADDED! GPA: " << GPA << " Credits Earned: " << unitsEarned << " Units Attempted " << unitsAttempted << "\n\n";
+				break;
+			}
 		}
 	}
-	GPA = unitsEarned / unitsAttempted;
-	printf("Your GPA rounded to 5 decimal points is %.5f\n", GPA);
 }
 
-int CalculateFutureGPA(std::vector<double> unit, std::vector<char> grade) {
-	double reachGPA, holdGPA, unitsAttempted = 0, unitsEarned = 0, GPA;
+void CalculateGPA(std::vector<double>& unit, std::vector<char>& grade, double& unitsAttempted, double& unitsEarned, double& GPA) {
+	if (!unit.empty()) {
+		for (int i = 0; i < unit.size(); i++) {
+			unitsAttempted += unit[i];
+			if (grade[i] == 'A') {
+				unitsEarned += unit[i] * 4;
+			}
+			else if (grade[i] == 'B') {
+				unitsEarned += unit[i] * 3;
+			}
+			else if (grade[i] == 'C') {
+				unitsEarned += unit[i] * 2;
+			}
+			else if (grade[i] == 'D') {
+				unitsEarned += unit[i];
+			}
+			else {
+				continue;
+			}
+		}
+	}
+	if (unitsAttempted == 0) {
+		std::cout << "No units or classes have been added!\n";
+	}
+	else {
+		GPA = unitsEarned / unitsAttempted;
+		printf("Your GPA rounded to 5 decimal points is %.5f\n", GPA);
+	}
+}
+
+int CalculateFutureGPA(std::vector<double> unit, std::vector<char> grade, double unitsAttempted, double unitsEarned, double GPA) {
+	double reachGPA, holdGPA;
 	for (int i = 0; i < unit.size(); i++) {
 		unitsAttempted += unit[i];
 		if (grade[i] == 'A') {
@@ -119,21 +147,71 @@ int CalculateFutureGPA(std::vector<double> unit, std::vector<char> grade) {
 		}
 	}
 }
-
 void displayClasses(std::vector<std::string> classes, std::vector<double> unit, std::vector<char> grade) {
-	for (int i = 0; i < classes.size(); i++) {
-		printf("Class Name: %s\nUnits: %.1f\nGrade Earned: %c\n\n", classes[i].c_str(), unit[i], grade[i]);
+	if (!classes.empty()) {
+		for (int i = 0; i < classes.size(); i++) {
+			printf("Class Name: %s\nUnits: %.1f\nGrade Earned: %c\n\n", classes[i].c_str(), unit[i], grade[i]);
+		}
 	}
+	else {
+		std::cout << "No classes were entered!\n";
+	}
+
+}
+
+void classesAfterAGrade(double unitsAttempted, double unitsEarned, double GPA) {
+	char grade;
+	int num;
+	double units;
+	while (true) {
+		std::cout << "How many grades will you be inputting? (This new GPA does not get saved)\n";
+		std::cin >> num;
+		if (isdigit(num)) { // FIX LATER
+			std::cout << "Invalid input";
+		}
+		else {
+			for (int i = 1; i <= num; ++i) {
+				std::cout << "Enter in the grade for class #" << i << ": ";
+				std::cin >> grade;
+				std::cout << "How many units is this class?\n";
+				std::cin >> units;
+				if (toupper(grade)!= 'A' && toupper(grade) != 'B' && toupper(grade) != 'C' && toupper(grade) != 'D' && toupper(grade) != 'F') {
+					std::cout << "Invalid input.. returning back to main\n";
+					break;
+				}
+				else if (grade == 'A' || grade == 'a') {
+					unitsEarned += 4 * units;
+				}
+				else if (grade == 'B' || grade == 'b') {
+					unitsEarned += 3 * units;
+				}
+				else if (grade == 'C' || grade == 'c') {
+					unitsEarned += 2 * units;
+				}
+				else if (grade == 'D' || grade == 'd') {
+					unitsEarned += units;
+				}
+				else if (grade == 'F' || grade == 'f') {
+					continue;
+				}
+				unitsAttempted += units;
+				printf("Your new GPA after that class is %.5f\n", GPA = unitsEarned / unitsAttempted);
+			}
+			break;
+		}
+	}
+	
 }
 
 int main() {
 	std::vector<std::string> classes;
 	std::vector<double> unit;
 	std::vector<char> grade;
+	double unitsAttempted = 0, GPA = 0, unitsEarned = 0;
 	std::cout << "Welcome to GPA Calculator! What can I do for you today?\n";
 	while (true) {
 		char option;
-		std::cout <<"(1) Add a class\n(2) Calculate current GPA for inputted classes\n(3) Grades needed for a certain GPA\n(4) View all classes\n(5) Exit\n >> ";
+		std::cout <<"(1) Add a class or enter current GPA\n(2) Calculate current GPA for inputted classes\n(3) Grades needed for a certain GPA\n(4) View all classes\n(5) GPA after a certain grade?\n(6) Exit\n >> ";
 		std::cin >> option;
 		std::cin.ignore();
 		if (!isdigit(option)) {
@@ -141,18 +219,41 @@ int main() {
 		}
 		else {
 			if (option == '1') {
-				AddClass(classes, unit, grade);
+				while (true) {
+					char temp;
+					std::cout << "Do you want to manually add classes or enter in your current GPA? Enter 1 or 2\n";
+					std::cin >> temp;
+					if (!isdigit(temp)) {
+						std::cout << "Invalid option!\n";
+					}
+					else {
+						if (temp == '1') {
+							AddClass(classes, unit, grade);
+							break;
+						}
+						else if (temp == '2') {
+							addUnits(unitsAttempted, unitsEarned, GPA);
+							break;
+						}
+						else {
+							std::cout << "Invalid option!\n";
+						}
+					}
+				}
 			}
 			else if (option == '2') {
-				CalculateGPA(unit, grade);
+				CalculateGPA(unit, grade, unitsAttempted, unitsEarned, GPA);
 			}
 			else if (option == '3') {
-				CalculateFutureGPA(unit, grade);
+				CalculateFutureGPA(unit, grade, unitsAttempted, unitsEarned, GPA);
 			}
 			else if (option == '4') {
 				displayClasses(classes, unit, grade);
 			}
 			else if (option == '5') {
+				classesAfterAGrade(unitsAttempted, unitsEarned, GPA);
+			}
+			else if (option == '6') {
 				std::cout << "Thanks for using my program!\n";
 				break;
 			}
